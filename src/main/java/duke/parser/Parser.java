@@ -1,21 +1,6 @@
 package duke.parser;
 
-import duke.command.SetPriorityCommand;
-import duke.command.AddMultipleCommand;
-import duke.command.DeleteCommand;
-import duke.command.Command;
-import duke.command.ListPriorityCommand;
-import duke.command.ExitCommand;
-import duke.command.BackupCommand;
-import duke.command.ListCommand;
-import duke.command.AddCommand;
-import duke.command.RemindCommand;
-import duke.command.DoneCommand;
-import duke.command.FindCommand;
-import duke.command.UpdateCommand;
-import duke.command.DuplicateFoundCommand;
-import duke.command.AddContactsCommand;
-import duke.command.ListContactsCommand;
+import duke.command.*;
 
 import duke.task.TaskList;
 import duke.task.Todo;
@@ -28,8 +13,10 @@ import duke.task.FixedDuration;
 import duke.task.DetectDuplicate;
 import duke.dukeexception.DukeException;
 import duke.task.Contacts;
+import duke.task.Budget;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Represents a parser that breaks down user input into commands.
@@ -253,7 +240,7 @@ public class Parser {
                     throw new DukeException("Format is in: fixedduration <task> /for <duration> <unit>");
                 }
                 unit = durDesc.split(" ")[1].trim();
-                if (unit.isEmpty() || (!unit.toLowerCase().contains("min") && ! unit.toLowerCase().contains("hour"))) {
+                if (unit.isEmpty() || (!unit.toLowerCase().contains("min") && !unit.toLowerCase().contains("hour"))) {
                     throw new DukeException("Format is in: fixedduration <task> /for <duration> <unit>");
                 } else {
                     FixedDuration fixedDuration = new FixedDuration(taskDesc, duration, unit);
@@ -372,17 +359,35 @@ public class Parser {
                 }
             }
         } else if (arr.length > 0 && arr[0].equals("addcontact")) {
-            String[] userInput = sentence.split(" ",2);
+            String[] userInput = sentence.split(" ", 2);
             String[] contactDetails = userInput[1].split(",");
             try {
                 Contacts contactObj = new Contacts(contactDetails[0], contactDetails[1],
-                                          contactDetails[2], contactDetails[3]);
+                        contactDetails[2], contactDetails[3]);
                 return new AddContactsCommand(contactObj);
             } catch (Exception e) {
                 throw new DukeException("Format is in: addcontact <name>, <contact>, <email>, <office>");
             }
         } else if (sentence.equals("listcontacts")) {
             return new ListContactsCommand();
+        } else if ((arr.length > 0 && arr[0].equals("budget"))) {
+            //budget <command> <amount>
+            String[] userInput = sentence.split(" ");
+            String command = userInput[1].trim();
+            String amount = userInput[2].trim();
+            Budget budget = new Budget(amount);
+            if (command.equals("new")) {
+                budget.updateBudget(amount);
+                return new BudgetCommand(budget);
+            } else if (command.equals("+")) {
+                budget.addBudget(amount);
+                return new BudgetCommand(budget);
+            } else if (command.equals("-")) {
+                budget.minusBudget(amount);
+                return new BudgetCommand(budget);
+            } else {
+                throw new DukeException("     (>_<) OoPS!!! Wrong command! :-(");
+            }
         } else if (sentence.equals("backup")) {
             return new BackupCommand();
         } else if (sentence.equals("bye") || sentence.equals("exit")) {

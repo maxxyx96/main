@@ -23,7 +23,6 @@ public class ContactStorage {
         this.filePathForContacts += filePathForContacts;
     }
 
-
     /**
      * Updates the contact list from reading the contents of the contacts text file.
      *

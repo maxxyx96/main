@@ -8,9 +8,11 @@ import duke.command.Command;
 import duke.command.ListPriorityCommand;
 import duke.command.ExitCommand;
 import duke.command.BackupCommand;
+import duke.command.BudgetCommand;
 
 import duke.dukeexception.DukeException;
 import duke.parser.Parser;
+import duke.storage.BudgetStorage;
 import duke.storage.PriorityStorage;
 import duke.storage.Storage;
 import duke.storage.ContactStorage;
@@ -32,22 +34,24 @@ public class Duke {
     private Ui ui;
     private ContactStorage contactStorage;
     private ContactList contactList;
-
+    private BudgetStorage budgetStorage;
     private PriorityStorage priorityStorage;
     private PriorityList priorityList;
-
+    private float storedBudget;
 
     /**
      * Creates a duke to initialize storage, task list, and ui.
      *
      * @param filePath1 The location of the text file.
      * @param filePath2 The location of the priority text file.
+     * @param filePathBudget The location of the budget text file.
      * @param filePathForContacts The location of the contact text file.
      */
-    public Duke(String filePath1, String filePath2, String filePathForContacts) {
+    public Duke(String filePath1, String filePath2, String filePathBudget,String filePathForContacts) {
         ui = new Ui();
         storage = new Storage(filePath1);
         priorityStorage = new PriorityStorage(filePath2);
+        budgetStorage = new BudgetStorage(filePathBudget);
         contactStorage = new ContactStorage(filePathForContacts);
         try {
             items = new TaskList(storage.read());
@@ -67,6 +71,13 @@ public class Duke {
         } catch (IOException e) {
             ui.showLoadingError();
             contactList = new ContactList();
+        }
+
+        try {
+            storedBudget = budgetStorage.read();
+        } catch (IOException e) {
+            ui.showLoadingError();
+            storedBudget = 0;
         }
     }
 
@@ -138,6 +149,8 @@ public class Duke {
                     cmd.execute(items, priorityList, ui);
                 } else if (cmd instanceof BackupCommand) {
                     cmd.executeStorage(items, ui, storage);
+                } else if (cmd instanceof BudgetCommand) {
+                    cmd.execute(items,budgetStorage,ui);
                 } else if (cmd instanceof AddContactsCommand) {
                     cmd.execute(items, contactList, ui);
                     cmd.executeStorage(items, ui, contactStorage,contactList);
@@ -160,6 +173,6 @@ public class Duke {
     }
 
     public static void main(String[] args) {
-        new Duke("data/duke.txt", "data/priority.txt","data/contacts.txt").run();
+        new Duke("data/duke.txt", "data/priority.txt", "data/budget.txt","data/contacts.txt").run();
     }
 }

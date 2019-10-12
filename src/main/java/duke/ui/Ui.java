@@ -382,4 +382,18 @@ public class Ui {
             out.println("     Now you have " + contactList.size() + " contacts.");
         }
     }
+
+    public void showAddedBudget(float amount, float budget) {
+        out.println("     " + amount + "has been added to budget.");
+        out.println("     " + "you have " + budget + " left.");
+    }
+
+    public void showMinusBudget(float amount, float budget) {
+        out.println("     " + amount + "has been deducted from budget.");
+        out.println("     " + "you have " + budget + " left.");
+    }
+
+    public void showBudget(float budget) {
+        out.println("     Budget updated successfully, you have " + budget + " left.");
+    }
 }
