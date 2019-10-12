@@ -1,5 +1,6 @@
 package duke.command;
 
+import duke.storage.BudgetStorage;
 import duke.storage.ContactStorage;
 import duke.storage.Storage;
 import duke.task.ContactList;
@@ -72,5 +73,14 @@ public abstract class Command {
     public void executeStorage(TaskList items, Ui ui, ContactStorage contactStorage,
                                 ContactList contactList) throws IOException {
     }
+
+    /**
+     * Executes a command with task list, budgetStorage and ui.
+     *
+     * @param items The task list that contains a list of tasks.
+     * @param budgetStorage Storage.
+     * @param ui To tell the user that it is executed successfully.
+     */
+    public abstract void execute(TaskList items, BudgetStorage budgetStorage, Ui ui);
 }
 
